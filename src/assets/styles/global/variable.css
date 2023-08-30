@@ -1,5 +1,8 @@
-:root{
-    --primary:#1e90ff;
-    --primary-rgb:31, 143, 255;
-    --white:#fff
+:root {
+  --primary: #1e90ff;
+  --primary-rgb: 31, 143, 255;
+  --white: #fff;
+  --error: #dc3545;
+  --warning: #ffcc00;
+  --success: #198754;
 }
