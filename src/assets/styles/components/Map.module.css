@@ -1,0 +1,29 @@
+.map_container {
+     width: 100vw;
+     height: 100vh;
+}
+
+.user_location_marker{
+     width: .75rem;
+     height: .75rem ;
+     border-radius: 100%;
+     background-color: rgb(30, 144, 255);
+     border: 2.7px solid white;
+     position: absolute;
+     top: 50%;
+     left: 50%;
+     box-shadow: 0 0 0 1rem rgba(30, 144, 255, .3);
+     animation: pulse 2s infinite ease;
+ }
+ @keyframes pulse {
+      0% {
+           box-shadow: 0 0 0 1rem rgba(30, 144, 255, .3);
+      }
+ 
+      50% {
+         box-shadow: 0 0 0 .3rem rgba(30, 144, 255, .3);
+      }
+     100% {
+         box-shadow: 0 0 0 1rem rgba(30, 144, 255, .3);
+      }
+ }
