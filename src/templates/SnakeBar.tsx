@@ -1,22 +1,25 @@
 import styles from "src/assets/styles/templates/SnakeBar.module.css";
 import { createPortal } from "react-dom";
 import { useSnakeBarStore } from "src/services/hooks/zustand/snakeBar/useSnakeBarStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const SnakeBar = () => {
   const { setSnakeBar, snakeBar } = useSnakeBarStore((state) => state);
-  let getSetTimeOut: number = 0;
+  const [getSetTimeOut, setGetSetTimeOut] = useState(0);
 
   const closeSnakeBar = () => {
-    setSnakeBar({ open: false, text: "", type: "warning" });
     clearTimeout(getSetTimeOut);
+    setSnakeBar({ open: false, text: "", type: "warning" });
+    setGetSetTimeOut(0);
   };
 
   useEffect(() => {
-    if (snakeBar.open) getSetTimeOut = setTimeout(closeSnakeBar, 3000);
+    if (snakeBar.open) {
+      setGetSetTimeOut(setTimeout(closeSnakeBar, 5000));
+    }
   }, [snakeBar.open]);
 
-  if (!snakeBar.open) return null;
+  if (!snakeBar.open && getSetTimeOut === 0) return null;
 
   return createPortal(
     <>
@@ -26,6 +29,7 @@ const SnakeBar = () => {
         }`}
         onClick={closeSnakeBar}
       >
+        {snakeBar.text}
         <span className="material-symbols-outlined">
           {snakeBar.type === "error"
             ? "error"
@@ -35,7 +39,6 @@ const SnakeBar = () => {
             ? "warning"
             : ""}
         </span>
-        {snakeBar.text}
       </div>
     </>,
     document.body
