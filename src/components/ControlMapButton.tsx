@@ -73,7 +73,7 @@ const ControlMapButton = () => {
         className={styles.get_user_location}
         onClick={findUserLocationHandler}
       >
-        !منو پیدا کن{" "}
+        منو پیدا کن{" "}
       </button>
     </>
   );
