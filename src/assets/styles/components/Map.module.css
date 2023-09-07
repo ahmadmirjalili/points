@@ -1,26 +1,40 @@
 .map_container {
-     width: 100%;
-     height: 100%;
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
-.user_location_marker{
-     width: .75rem;
-     height: .75rem ;
-     border-radius: 100%;
-     background-color: var(--primary);
-     border: 2.7px solid var(--white);
-     box-shadow: 0 0 0 1rem rgba(var(--primary-rgb), .3);
-     animation: pulse 2s infinite ease;
- }
- @keyframes pulse {
-      0% {
-           box-shadow: 0 0 0 1rem rgba(var(--primary-rgb), .3);
-      }
- 
-      50% {
-         box-shadow: 0 0 0 .3rem rgba(var(--primary-rgb), .3);
-      }
-     100% {
-         box-shadow: 0 0 0 1rem rgba(var(--primary-rgb), .3);
-      }
- }
+.user_location_marker {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 100%;
+  background-color: var(--primary);
+  border: 2.7px solid var(--white);
+  box-shadow: 0 0 0 1rem rgba(var(--primary-rgb), 0.3);
+  animation: pulse 2s infinite ease;
+}
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 1rem rgba(var(--primary-rgb), 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 0 0.3rem rgba(var(--primary-rgb), 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 1rem rgba(var(--primary-rgb), 0.3);
+  }
+}
+
+.location_marker {
+  width: 50px;
+  height: 50px;
+}
+
+.circle_marker {
+  width: 13.8px;
+  height: 13.8px;
+  border-radius: 100%;
+  background-color: var(--white);
+  border: 5px solid var(--primary);
+}

@@ -1,0 +1,27 @@
+.submit_button {
+  width: 8rem;
+  height: 3rem;
+  text-align: center;
+  background-color: var(--primary);
+  color: var(--white);
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translate(-50%);
+  z-index: 401;
+}
+.marker_position {
+  position: fixed;
+  z-index: 400;
+  left: calc(50% - -2.5px);
+  top: calc(50% - -2.5px);
+  transform: translate(calc(-50% - -2.5px), calc(-50% - -2.5px));
+  width: 12.9px;
+  height: 12.9px;
+  border-radius: 100%;
+  background-color: transparent;
+  border: 5px solid var(--primary);
+}
