@@ -38,3 +38,9 @@
   background-color: var(--white);
   border: 5px solid var(--primary);
 }
+
+.navigation_marker {
+  color: var(--success);
+  background-color: red;
+  font-size: 2rem;
+}

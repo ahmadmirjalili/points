@@ -1,15 +1,15 @@
-import { MouseEventHandler, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import styles from "src/assets/styles/components/MenuDrawer.module.css";
 import { useMapStore } from "src/services/hooks/zustand/map/useMapStore";
-import L from "leaflet";
+import L, { Marker as MarkerType } from "leaflet";
 import { markers } from "src/services/utils/map/markers";
-import Marker from "./Marker";
 import { useGet } from "src/services/hooks/api/useFether";
 import { direction as directionApi } from "src/services/api/direction/indx";
 import mapBoxLine from "@mapbox/polyline";
 import { color } from "src/services/utils/constants/color";
 import Spinner from "src/templates/Spinner";
 import { modifierHandler } from "src/services/utils/map/directionModifier";
+import Marker from "./Marker";
 
 const MenuDrawer = () => {
   const map = useMapStore((state) => state.map);
@@ -17,6 +17,7 @@ const MenuDrawer = () => {
   const [showMarker, setShowMarker] = useState(false);
   const [directionMethod, setDirectionMethod] = useState("car");
   const [selectCustomRoute, setSelectCustomRoute] = useState("");
+  const [intervalId, setIntervalId] = useState(0);
   const [directionPoints, setDirectionPoints] = useState({
     start: [0, 0],
     end: [0, 0],
@@ -48,7 +49,7 @@ const MenuDrawer = () => {
           );
           getLocation.length !== 1 && getLocation.reverse();
           getLocation.map((item, i) => {
-            L.polyline(item.reverse() as any, {
+            const DirectionLine = L.polyline(item.reverse() as any, {
               color:
                 getLocation.length === 1 || i === 1
                   ? color.primary
@@ -56,15 +57,38 @@ const MenuDrawer = () => {
               dashArray: i === 2 ? "10" : undefined,
             }).addTo(map);
 
-            map.setView(
-              res.routes[0].legs[0].steps[0].start_location.reverse() as any,
-              20
-            );
+            map.fitBounds(DirectionLine.getBounds());
           });
         }
       },
     }
   );
+  useEffect(() => {
+    if (!!directionData) {
+      setIntervalId(
+        setInterval(() => {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(getUserLocation);
+          }
+        }, 1000)
+      );
+    } else {
+      clearInterval(intervalId);
+    }
+  }, [directionData]);
+  let marker: MarkerType | null = null;
+  const getUserLocation: PositionCallback = (result) => {
+    const { latitude, longitude } = result.coords;
+    if (map && longitude && latitude) {
+      console.log("marker", marker);
+      if (!!marker) {
+        marker.setLatLng([latitude, longitude]).addTo(map);
+      } else
+        marker = L.marker([latitude, longitude], {
+          icon: markers.navigation,
+        }).addTo(map);
+    }
+  };
 
   const changShowMarker = () => {
     setShowMarker((pre) => !pre);
