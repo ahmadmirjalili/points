@@ -13,7 +13,8 @@ const ControlMapButton = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         getUserLocation,
-        getLocationErrorHandler
+        getLocationErrorHandler,
+        { enableHighAccuracy: true }
       );
     } else {
       setSnakeBar({
