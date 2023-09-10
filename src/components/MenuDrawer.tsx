@@ -17,7 +17,7 @@ const MenuDrawer = () => {
   const [showMarker, setShowMarker] = useState(false);
   const [directionMethod, setDirectionMethod] = useState("car");
   const [selectCustomRoute, setSelectCustomRoute] = useState("");
-  const [intervalId, setIntervalId] = useState(0);
+  const [watchPositionId, setWatchPositionId] = useState(0);
   const [directionPoints, setDirectionPoints] = useState({
     start: [0, 0],
     end: [0, 0],
@@ -65,19 +65,18 @@ const MenuDrawer = () => {
   );
   useEffect(() => {
     if (!!directionData) {
-      setIntervalId(
-        setInterval(() => {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(getUserLocation);
-          }
-        }, 1000)
+      setWatchPositionId(
+        navigator.geolocation.watchPosition(getUserLocation, undefined, {
+          enableHighAccuracy: true,
+        })
       );
-    } else {
-      clearInterval(intervalId);
     }
+    return navigator.geolocation.clearWatch(watchPositionId);
   }, [directionData]);
   let marker: MarkerType | null = null;
   const getUserLocation: PositionCallback = (result) => {
+    console.log("result", result);
+
     const { latitude, longitude } = result.coords;
     if (map && longitude && latitude) {
       console.log("marker", marker);
@@ -85,7 +84,7 @@ const MenuDrawer = () => {
         marker.setLatLng([latitude, longitude]).addTo(map);
       } else
         marker = L.marker([latitude, longitude], {
-          icon: markers.navigation,
+          icon: markers.userLocation,
         }).addTo(map);
     }
   };
