@@ -1,15 +1,21 @@
 .drawer_container {
-  width: 50%;
+  width: calc(95% - 2rem);
   max-width: 350px;
   background-color: var(--white);
   padding: 1rem;
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 400;
+  position: fixed;
+  bottom: 0;
+  right: 2rem;
+  z-index: 1000;
   border-radius: 0.5rem;
   max-height: 90%;
   overflow: hidden;
+}
+@media only screen and (max-width: 1024px) {
+  .drawer_container {
+    right: 50%;
+    transform: translate(50%);
+  }
 }
 .selected_user_location {
   width: 100%;
@@ -124,6 +130,16 @@
   background-color: var(--gray-4);
 }
 
+.selected {
+  height: 100%;
+  width: 0.4rem;
+  border-radius: 0.5rem 0 0 0.5rem;
+  background-color: var(--primary);
+  position: absolute;
+  right: 0;
+  margin: 0 !important;
+}
+
 .direction_route {
   all: unset;
   display: flex;
@@ -136,16 +152,6 @@
   position: relative;
   height: 100%;
 }
-.selected {
-  height: 100%;
-  width: 0.4rem;
-  border-radius: 0.5rem 0 0 0.5rem;
-  background-color: var(--primary);
-  position: absolute;
-  right: 0;
-  margin: 0 !important;
-}
-
 .direction_route span {
   font-size: 2rem;
 }
@@ -179,11 +185,10 @@
   overflow: scroll;
 }
 .mobile_direction_container {
-  max-height: 60vh;
   overflow: scroll;
-  display: flex;
-  flex-direction: column-reverse;
   width: 100%;
+  height: calc(100% - 50px);
+  padding-bottom: 4rem;
 }
 
 .direction_container {
@@ -222,37 +227,45 @@
   cursor: pointer;
 }
 
-.direction_title {
+.direction_header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.direction_header_text {
+  display: flex;
+  align-items: center;
+}
+.direction_header_text span {
+  font-size: 1.4rem;
+  margin-right: 0.5rem;
 }
 
 .mobile_drawer_container {
   width: 90%;
   position: fixed;
-  top: 0;
+  bottom: 0;
   left: 50%;
-  transform: translate(-50%, -60%);
+  transform: translate(-50%);
   background-color: var(--white);
   max-width: 500px;
-  min-height: 3rem;
-  z-index: 401;
-  border-radius: 0 0 1rem 1rem;
-  max-height: 500px;
+  height: 20vh;
+  z-index: 1000;
+  border-radius: 1rem 1rem 0 0;
   transition: all 0.3s ease;
 }
 
 .open_mobile_drawer {
-  transform: translate(-50%, 0) !important;
+  height: 80vh;
 }
 .mobile_direction_info_text {
   font-size: 0.6rem !important;
   margin: 0.4rem 0.5rem 0.2rem 0.5rem !important;
   color: var(--gray-5) !important;
 }
-.no_margin {
+.mobile_direction_info {
   margin: 0 !important;
+  justify-content: flex-start !important;
 }
 .mobile_method_selected_show {
   background-color: var(--primary);
@@ -271,15 +284,90 @@
 
 .mobile_drawer_icon {
   margin: 0 1rem;
-  transform: rotate(180deg);
+  transform: rotate(0);
   transition: all 0.3s ease;
 }
 .toggle_drawer_icon {
-  transform: rotate(0);
+  transform: rotate(180deg);
 }
 .mobile_custom_shadow {
   box-shadow: 0 2px 20px 0 rgba(75, 83, 98, 0.16);
+  border-radius: 1rem 1rem 0 0;
+
+  background-color: var(--white);
 }
-.remove_width {
-  width: auto !important;
+
+.mobile_direction_route {
+  all: unset;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--gray-4);
+  border-width: 1px 0 0 0;
+  padding: 1rem 0.6rem;
+  cursor: pointer;
+  width: calc(100% - 1.2rem);
+  position: relative;
+  height: fit-content;
+}
+.mobile_direction_route span {
+  font-size: 2rem;
+}
+.mobile_direction_route div {
+  margin-inline-start: 0.5rem;
+}
+.mobile_direction_route div p {
+  margin: 0;
+  padding: 0;
+}
+.mobile_direction_route div p:first-child {
+  font-size: 0.85rem;
+  color: var(--gray-11);
+  font-weight: bold;
+}
+.mobile_direction_route div p:last-child {
+  font-size: 0.65rem;
+  color: var(--gray-5);
+
+  display: flex;
+  align-items: center;
+}
+.mobile_direction_route div p:last-child span {
+  color: var(--gray-11);
+  font-size: 1rem;
+  margin: 0.2rem;
+}
+.close_icon {
+  margin-left: auto;
+  display: block;
+  color: var(--gray-7);
+}
+.direction_button {
+  text-align: center;
+  background-color: var(--gray-1);
+  color: var(--primary);
+  position: fixed;
+  top: 5rem;
+  left: 1rem;
+  z-index: 400;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 0px 19px -5px rgba(0, 0, 0, 0.85);
+  -webkit-box-shadow: 0px 0px 19px -5px rgba(0, 0, 0, 0.85);
+  -moz-box-shadow: 0px 0px 19px -5px rgba(0, 0, 0, 0.85);
+}
+.hide_direction_button {
+  display: none;
+}
+.input_close_icon {
+  font-size: 1rem;
+  color: var(--gray-5);
+  margin: 0 0.2rem;
+}
+.disable_button {
+  opacity: 0.3;
 }

@@ -32,11 +32,11 @@
 }
 
 .circle_marker {
-  width: 13.8px;
-  height: 13.8px;
+  width: 1.3rem !important;
+  height: 1.3rem !important;
+  border: 4px solid var(--primary);
   border-radius: 100%;
   background-color: var(--white);
-  border: 5px solid var(--primary);
 }
 
 .navigation_marker {

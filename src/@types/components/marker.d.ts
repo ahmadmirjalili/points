@@ -1,5 +1,6 @@
 export namespace MarkerComponent {
   type Props = {
-    onClick: () => void;
+    submitHandler: () => void;
+    cancelHandler: () => void;
   };
 }

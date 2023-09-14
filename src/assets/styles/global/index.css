@@ -43,6 +43,7 @@
 
 * {
   font-family: vazir;
+  box-sizing: border-box;
 }
 html,
 body {

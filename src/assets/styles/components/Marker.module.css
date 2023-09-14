@@ -7,21 +7,37 @@
   border-radius: 0.5rem;
   font-weight: 500;
   cursor: pointer;
-  position: fixed;
-  bottom: 2rem;
-  left: 50%;
-  transform: translate(-50%);
-  z-index: 401;
+  margin-left: 0.5rem;
+}
+.cancel_button {
+  width: 8rem;
+  height: 3rem;
+  text-align: center;
+  background-color: var(--error);
+  color: var(--white);
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: 0.5rem;
 }
 .marker_position {
   position: fixed;
   z-index: 400;
-  left: calc(50% - -2.5px);
-  top: calc(50% - -2.5px);
-  transform: translate(calc(-50% - -2.5px), calc(-50% - -2.5px));
-  width: 12.9px;
-  height: 12.9px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 1.3rem;
+  height: 1.3rem;
+  border: 4px solid var(--primary);
   border-radius: 100%;
   background-color: transparent;
-  border: 5px solid var(--primary);
+}
+.button_container {
+  display: flex;
+  align-items: center;
+  left: 50%;
+  transform: translate(-50%);
+  position: fixed;
+  bottom: 2rem;
+  z-index: 401;
 }
