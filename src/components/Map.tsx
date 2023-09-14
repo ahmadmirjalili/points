@@ -20,17 +20,14 @@ const Map = () => {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
     L.tileLayer(
-      "https://tiles.stadiamaps.com/tiles/stamen_terrain_lines/{z}/{x}/{y}{r}.{ext}",
+      "https://tiles.stadiamaps.com/tiles/stamen_terrain_lines/{z}/{x}/{y}{r}.png",
       {
         minZoom: 0,
         maxZoom: 18,
-        attribution:
-          '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        //@ts-ignore
-        ext: "png",
+        attribution: "",
       }
     ).addTo(map);
-
+    map.addEventListener("click", (e) => console.log(e.latlng));
     setMap(map);
   }, []);
 

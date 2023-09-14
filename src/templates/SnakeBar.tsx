@@ -29,7 +29,6 @@ const SnakeBar = () => {
         }`}
         onClick={closeSnakeBar}
       >
-        {snakeBar.text}
         <span className="material-symbols-outlined">
           {snakeBar.type === "error"
             ? "error"
@@ -39,6 +38,7 @@ const SnakeBar = () => {
             ? "warning"
             : ""}
         </span>
+        {snakeBar.text}
       </div>
     </>,
     document.body

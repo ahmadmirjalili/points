@@ -6,7 +6,7 @@ import { markers } from "src/services/utils/map/markers";
 import { useGet } from "src/services/hooks/api/useFether";
 import { direction as directionApi } from "src/services/api/direction/indx";
 import mapBoxLine from "@mapbox/polyline";
-import { color } from "src/services/utils/constants/color";
+import { variable } from "src/services/utils/constants/variable";
 import Spinner from "src/templates/Spinner";
 import { modifierHandler } from "src/services/utils/map/directionModifier";
 import Marker from "./Marker";
@@ -14,14 +14,25 @@ import Marker from "./Marker";
 const MenuDrawer = () => {
   const map = useMapStore((state) => state.map);
 
-  const [showMarker, setShowMarker] = useState(false);
+  const [showMarker, setShowMarker] = useState("");
   const [directionMethod, setDirectionMethod] = useState("car");
   const [selectCustomRoute, setSelectCustomRoute] = useState("");
   const [openMobileDrawer, setOpenMobileDrawer] = useState(false);
+  const [selectRoteModal, setSelectRoteModal] = useState(false);
   const [watchPositionId, setWatchPositionId] = useState(0);
   const [directionPoints, setDirectionPoints] = useState({
-    start: [36.40006289696562, 51.3556571722927],
-    end: [35.83585105054595, 50.99441530415788],
+    start: {
+      complete: false,
+      lat: 0,
+      lng: 0,
+      routeInfo: "",
+    },
+    end: {
+      complete: false,
+      lat: 0,
+      lng: 0,
+      routeInfo: "",
+    },
   });
 
   const {
@@ -33,13 +44,14 @@ const MenuDrawer = () => {
     directionApi,
     {
       alternative: true,
-      destination_lat: directionPoints.end[0],
-      destination_lng: directionPoints.end[1],
-      origin_lat: directionPoints.start[0],
-      origin_lng: directionPoints.start[1],
+      destination_lat: directionPoints.end.lat,
+      destination_lng: directionPoints.end.lng,
+      origin_lat: directionPoints.start.lat,
+      origin_lng: directionPoints.start.lng,
       type: directionMethod,
     },
     {
+      enable: false,
       onSuccess(res) {
         if (map) {
           const getLocation = res.routes.map((item) =>
@@ -52,8 +64,8 @@ const MenuDrawer = () => {
             const DirectionLine = L.polyline(item.reverse() as any, {
               color:
                 getLocation.length === 1 || i === 1
-                  ? color.primary
-                  : color.error,
+                  ? variable.primary
+                  : variable.error,
               dashArray: i === 2 ? "10" : undefined,
             }).addTo(map);
 
@@ -74,12 +86,22 @@ const MenuDrawer = () => {
     return navigator.geolocation.clearWatch(watchPositionId);
   }, [directionData]);
   let marker: MarkerType | null = null;
-  const getUserLocation: PositionCallback = (result) => {
-    console.log("result", result);
 
+  const getUserLocation: PositionCallback = (result) => {
     const { latitude, longitude } = result.coords;
+
+    directionData?.routes[0].legs.map((leg) =>
+      leg.steps.map((step, i) => {
+        if (
+          step.start_location[0] + step.start_location[1] <
+          latitude + longitude
+        ) {
+          highlightCustomRoute(step.polyline, `button${i}`);
+        }
+      })
+    );
+
     if (map && longitude && latitude) {
-      console.log("marker", marker);
       if (!!marker) {
         marker.setLatLng([latitude, longitude]).addTo(map);
       } else
@@ -89,31 +111,27 @@ const MenuDrawer = () => {
     }
   };
 
-  const changShowMarker = () => {
-    setShowMarker((pre) => !pre);
+  const changShowMarker = (value: string) => {
+    setShowMarker(value);
   };
-  const userSelectHandler = () => {
+  const userSelectHandler = (step: "start" | "end") => {
     if (map) {
       const { lat, lng } = map.getCenter();
       L.marker([lat, lng], { icon: markers.circleMarker }).addTo(map);
-
-      setDirectionPoints((pre) => {
-        if (pre.start.join("") === "00") {
-          return {
-            ...pre,
-            start: [lat, lng],
-          };
-        } else {
-          return {
-            ...pre,
-            end: [lat, lng],
-          };
-        }
-      });
+      setDirectionPoints((pre) => ({
+        ...pre,
+        [step]: {
+          complete: true,
+          lat: lat,
+          lng: lng,
+          routeInfo: "",
+        },
+      }));
     }
-    changShowMarker();
+    changShowMarker("");
   };
-  const cancelDirectionHandler = () => {
+  const cancelDirectionHandler: MouseEventHandler<HTMLSpanElement> = (e) => {
+    e.stopPropagation();
     // @ts-ignore
     const createLayerArr: any[] = Object.values(map?._layers);
 
@@ -123,57 +141,159 @@ const MenuDrawer = () => {
       }
     });
     setDirectionData(undefined);
-    setDirectionPoints({ start: [0, 0], end: [0, 0] });
+    setDirectionPoints({
+      start: {
+        complete: false,
+        lat: 0,
+        lng: 0,
+        routeInfo: "",
+      },
+      end: {
+        complete: false,
+        lat: 0,
+        lng: 0,
+        routeInfo: "",
+      },
+    });
+    setSelectRoteModal(false);
   };
 
   const selectMethodHandler: MouseEventHandler<HTMLDivElement> = (e) => {
     setDirectionMethod(e.currentTarget.id);
   };
-  const highlightCustomRoute: MouseEventHandler<HTMLButtonElement> = (e) => {
-    setSelectCustomRoute(e.currentTarget.id);
+  const highlightCustomRoute = (polyline: string, id: string) => {
+    const getCurrentElement = document.getElementById(id);
+    openMobileDrawer && mobileDrawerHandler();
+    setSelectCustomRoute(polyline);
     if (map) {
       const createLayerArr: any[] = Object.values(
         //@ts-ignore
         map?._layers
       );
-
       createLayerArr.forEach((layer, i) => {
-        if (layer.options.color === color.success && map) {
+        console.log("layer", layer);
+
+        if (layer.options.color === variable.success && map) {
           map.removeLayer(createLayerArr[i]);
         }
       });
-      const decodePolyline = mapBoxLine.decode(e.currentTarget.id);
+      const decodePolyline = mapBoxLine.decode(polyline);
       const createLine = L.polyline(decodePolyline, {
-        color: color.success,
+        color: variable.success,
       }).addTo(map);
       map.fitBounds(createLine.getBounds());
     }
+    if (openMobileDrawer)
+      setTimeout(() => {
+        getCurrentElement?.scrollIntoView();
+      }, 250);
+    else getCurrentElement?.scrollIntoView();
     return;
   };
   const mobileDrawerHandler = () => {
     setOpenMobileDrawer((pre) => !pre);
   };
+  const selectRouteModalHandler = () => {
+    setSelectRoteModal((pre) => !pre);
+  };
+  const clearSearchDirectionInput = (step: "start" | "end") => {
+    //@ts-ignore
+    const createLayerArr: any[] = Object.values(map?._layers);
+
+    createLayerArr.forEach((layer, i) => {
+      if (
+        layer?._latlng?.lng === directionPoints[step].lng &&
+        layer?._latlng?.lat === directionPoints[step].lat &&
+        map
+      ) {
+        map.removeLayer(createLayerArr[i]);
+      }
+    });
+    changShowMarker("");
+    setDirectionPoints((pre) => ({
+      ...pre,
+      [step]: {
+        complete: false,
+        lat: 0,
+        lng: 0,
+        routeInfo: "",
+      },
+    }));
+  };
 
   return (
     <>
-      {!showMarker && window.innerWidth > 1024 && (
+      <button
+        className={`${styles.direction_button} ${
+          showMarker !== "" || !!directionData || selectRoteModal
+            ? styles.hide_direction_button
+            : ""
+        } material-symbols-outlined`}
+        onClick={selectRouteModalHandler}
+      >
+        directions
+      </button>
+
+      {showMarker === "" && !directionData?.routes && selectRoteModal && (
         <div className={styles.drawer_container}>
+          <span
+            onClick={selectRouteModalHandler}
+            className={`material-symbols-outlined ${styles.close_icon}`}
+          >
+            close
+          </span>
           {!directionData?.routes && (
             <>
               <div className={styles.selected_user_location}>
                 <label>مبدا</label>
-                <div className={styles.search_box} onClick={changShowMarker}>
-                  {directionPoints.start.join("") === "00"
-                    ? "انتخاب روی نقشه"
-                    : directionPoints.start.join(",")}
+                <div
+                  className={styles.search_box}
+                  onClick={() => {
+                    !directionPoints.start.complete && changShowMarker("start");
+                  }}
+                >
+                  {directionPoints.start.complete
+                    ? directionPoints.start.routeInfo !== ""
+                      ? directionPoints.start.routeInfo
+                      : `${directionPoints.start.lat} , ${directionPoints.start.lng}`
+                    : "انتخاب روی نقشه"}
+                  {directionPoints.start.complete && (
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        clearSearchDirectionInput("start");
+                      }}
+                      className={`material-symbols-outlined ${styles.input_close_icon}`}
+                    >
+                      close
+                    </span>
+                  )}
                 </div>
               </div>
               <div className={styles.selected_user_location}>
                 <label>مقصد</label>
-                <div className={styles.search_box} onClick={changShowMarker}>
-                  {directionPoints.end.join("") === "00"
-                    ? "انتخاب روی نقشه"
-                    : directionPoints.start.join(",")}
+                <div
+                  className={styles.search_box}
+                  onClick={() =>
+                    !directionPoints.end.complete && changShowMarker("end")
+                  }
+                >
+                  {directionPoints.end.complete
+                    ? directionPoints.end.routeInfo !== ""
+                      ? directionPoints.end.routeInfo
+                      : `${directionPoints.end.lat} , ${directionPoints.end.lng}`
+                    : "انتخاب روی نقشه"}
+                  {directionPoints.end.complete && (
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        clearSearchDirectionInput("end");
+                      }}
+                      className={`material-symbols-outlined ${styles.input_close_icon}`}
+                    >
+                      close
+                    </span>
+                  )}
                 </div>
               </div>
               <div className={styles.direction_method}>
@@ -203,146 +323,119 @@ const MenuDrawer = () => {
                 </div>
               </div>
               <button
-                className={styles.start_button}
+                className={`${styles.start_button}  ${
+                  !(
+                    directionPoints.start.complete &&
+                    directionPoints.end.complete
+                  ) && styles.disable_button
+                }`}
                 onClick={reFetchDirection}
+                disabled={
+                  !(
+                    directionPoints.start.complete &&
+                    directionPoints.end.complete
+                  )
+                }
               >
                 {directionLoading ? <Spinner /> : "بریم"}
               </button>
             </>
           )}
-          {!!directionData && (
-            <>
-              <div className={styles.direction_title}>
-                <p className={styles.direction_info_text}>
-                  {directionData?.routes[0].legs[0].summary}
-                </p>
-                <div className={styles.method_selected_show}>
-                  <span className="material-symbols-outlined">
-                    {directionMethod === "car"
-                      ? "directions_car"
-                      : "two_wheeler"}
-                  </span>
-                </div>
-              </div>
-
-              <div className={styles.direction_info}>
-                <div>
-                  <p>{directionData?.routes[0].legs[0].duration.text}</p>
-                </div>
-                <div className={styles.line} />
-                <div>
-                  <p> {directionData?.routes[0].legs[0].distance.text}</p>
-                </div>
-              </div>
-
-              <div className={styles.direction_container}>
-                {directionData?.routes[0].legs[0].steps.map((step) => (
-                  <button
-                    id={step.polyline}
-                    className={styles.direction_route}
-                    onClick={highlightCustomRoute}
-                  >
-                    <span className="material-symbols-outlined">
-                      {modifierHandler(step.modifier)}
-                    </span>
-                    <div>
-                      <p>{step.instruction}</p>
-                      <p>
-                        {step.distance.text && (
-                          <>
-                            {step.distance.text} <span> - </span>{" "}
-                            {step.duration.text}
-                          </>
-                        )}
-                      </p>
-                    </div>
-                    {selectCustomRoute === step.polyline && (
-                      <div className={styles.selected} />
-                    )}
-                  </button>
-                ))}
-              </div>
-              <button
-                className={styles.cancel_button}
-                onClick={cancelDirectionHandler}
-              >
-                لغو
-              </button>
-            </>
-          )}
         </div>
       )}
-      <div
-        className={`${styles.mobile_drawer_container} ${
-          openMobileDrawer ? styles.open_mobile_drawer : ""
-        }`}
-      >
-        <div className={styles.mobile_direction_container}>
-          {directionData?.routes[0].legs[0].steps.map((step) => (
-            <button
-              id={step.polyline}
-              className={`${styles.direction_route} ${styles.remove_width}`}
-              onClick={highlightCustomRoute}
-            >
-              <span className="material-symbols-outlined">
-                {modifierHandler(step.modifier)}
-              </span>
-              <div>
-                <p>{step.instruction}</p>
-                <p>
-                  {step.distance.text && (
-                    <>
-                      {step.distance.text} <span> - </span> {step.duration.text}
-                    </>
-                  )}
-                </p>
-              </div>
-              {selectCustomRoute === step.polyline && (
-                <div className={styles.selected} />
-              )}
-            </button>
-          ))}
-        </div>
+      {!!directionData && (
         <div
-          className={`${styles.direction_title}  ${styles.mobile_custom_shadow}`}
+          className={`${styles.mobile_drawer_container} ${
+            openMobileDrawer ? styles.open_mobile_drawer : ""
+          }`}
         >
-          <div>
-            <p className={styles.mobile_direction_text}>
-              {directionData?.routes[0].legs[0].summary}
-            </p>
-            <div className={`${styles.direction_info} ${styles.no_margin}`}>
+          <div
+            onClick={mobileDrawerHandler}
+            className={`${styles.direction_header}  ${styles.mobile_custom_shadow}`}
+          >
+            <div className={styles.direction_header_text}>
+              <span
+                onClick={cancelDirectionHandler}
+                className={`material-symbols-outlined`}
+              >
+                close
+              </span>
               <div>
-                <p className={styles.mobile_direction_info_text}>
-                  {directionData?.routes[0].legs[0].duration.text}
+                <p className={styles.mobile_direction_text}>
+                  {directionData?.routes[0].legs[0].summary}
                 </p>
-              </div>
-              <div className={styles.mobile_line} />
-              <div>
-                <p className={styles.mobile_direction_info_text}>
-                  {" "}
-                  {directionData?.routes[0].legs[0].distance.text}
-                </p>
+                <div
+                  className={`${styles.direction_info} ${styles.mobile_direction_info}`}
+                >
+                  <div>
+                    <p className={styles.mobile_direction_info_text}>
+                      {directionData?.routes[0].legs[0].duration.text}
+                    </p>
+                  </div>
+                  <div className={styles.mobile_line} />
+                  <div>
+                    <p className={styles.mobile_direction_info_text}>
+                      {directionData?.routes[0].legs[0].distance.text}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          <div className={styles.mobile_icon_container}>
-            <div className={styles.mobile_method_selected_show}>
-              <span className="material-symbols-outlined">
-                {directionMethod === "car" ? "directions_car" : "two_wheeler"}
+            <div className={styles.mobile_icon_container}>
+              <div className={styles.mobile_method_selected_show}>
+                <span className="material-symbols-outlined">
+                  {directionMethod === "car" ? "directions_car" : "two_wheeler"}
+                </span>
+              </div>
+              <span
+                className={`material-symbols-outlined ${
+                  openMobileDrawer ? styles.toggle_drawer_icon : ""
+                } ${styles.mobile_drawer_icon}`}
+              >
+                expand_less
               </span>
             </div>
-            <span
-              onClick={mobileDrawerHandler}
-              className={`material-symbols-outlined ${
-                openMobileDrawer ? styles.toggle_drawer_icon : ""
-              } ${styles.mobile_drawer_icon}`}
-            >
-              expand_less
-            </span>
+          </div>
+          <div
+            className={styles.mobile_direction_container}
+            id="route_container"
+          >
+            {directionData?.routes[0].legs[0].steps.map((step, i) => (
+              <button
+                id={`button${i}`}
+                className={`${styles.mobile_direction_route}`}
+                onClick={(e) =>
+                  highlightCustomRoute(step.polyline, `button${i}`)
+                }
+              >
+                <span className="material-symbols-outlined">
+                  {modifierHandler(step.modifier)}
+                </span>
+                <div>
+                  <p>{step.instruction}</p>
+                  <p>
+                    {step.distance.text && (
+                      <>
+                        {step.distance.text} <span> - </span>{" "}
+                        {step.duration.text}
+                      </>
+                    )}
+                  </p>
+                </div>
+                {selectCustomRoute === step.polyline && (
+                  <div className={styles.selected} />
+                )}
+              </button>
+            ))}
           </div>
         </div>
-      </div>
-      {showMarker && <Marker onClick={userSelectHandler} />}
+      )}
+      {showMarker !== "" && (
+        <Marker
+          submitHandler={() => userSelectHandler(showMarker as any)}
+          cancelHandler={() => changShowMarker("")}
+        />
+      )}
     </>
   );
 };

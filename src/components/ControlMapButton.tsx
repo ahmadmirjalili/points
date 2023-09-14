@@ -74,7 +74,7 @@ const ControlMapButton = () => {
         className={styles.get_user_location}
         onClick={findUserLocationHandler}
       >
-        منو پیدا کن{" "}
+        <span className="material-symbols-outlined">near_me</span>
       </button>
     </>
   );

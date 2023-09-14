@@ -1,4 +1,4 @@
-export const color = {
+export const variable = {
   primary: "#1e90ff",
   white: "#fff",
   error: "#dc3545",
@@ -15,4 +15,5 @@ export const color = {
   "gray-9": "#1f2937",
   "gray-10": "#111827",
   "gray-11": "#030712",
+  "wide-size": 1024,
 };

@@ -14,5 +14,6 @@ export const markers = {
 
   circleMarker: L.divIcon({
     className: styles.circle_marker,
+    iconSize: [20.8, 20.8],
   }),
 };
