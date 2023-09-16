@@ -1,7 +1,7 @@
-import { MouseEventHandler, useEffect, useState } from "react";
+import { MouseEventHandler, useState, useEffect } from "react";
 import styles from "src/assets/styles/components/MenuDrawer.module.css";
 import { useMapStore } from "src/services/hooks/zustand/map/useMapStore";
-import L, { Marker as MarkerType } from "leaflet";
+import L from "leaflet";
 import { markers } from "src/services/utils/map/markers";
 import { useGet } from "src/services/hooks/api/useFether";
 import { direction as directionApi } from "src/services/api/direction/indx";
@@ -85,22 +85,22 @@ const MenuDrawer = () => {
     }
     return navigator.geolocation.clearWatch(watchPositionId);
   }, [directionData]);
-  let marker: MarkerType | null = null;
+  let marker: any | null = null;
 
   const getUserLocation: PositionCallback = (result) => {
     const { latitude, longitude } = result.coords;
-
-    directionData?.routes[0].legs.map((leg) =>
-      leg.steps.map((step, i) => {
-        if (
-          step.start_location[0] + step.start_location[1] <
-          latitude + longitude
-        ) {
-          highlightCustomRoute(step.polyline, `button${i}`);
-        }
-      })
+    // map?.on('')
+    let getIndex = undefined;
+    getIndex = directionData?.routes[0].legs[0].steps.findIndex(
+      (step, i) => step.start_location[0] + step.start_location[1] < +longitude
     );
-
+    if (getIndex) {
+      getIndex > 0 &&
+        highlightCustomRoute(
+          directionData?.routes[0].legs[0].steps[getIndex].polyline ?? "",
+          `button${getIndex ?? ""}`
+        );
+    }
     if (map && longitude && latitude) {
       if (!!marker) {
         marker.setLatLng([latitude, longitude]).addTo(map);
@@ -195,6 +195,8 @@ const MenuDrawer = () => {
   };
   const selectRouteModalHandler = () => {
     setSelectRoteModal((pre) => !pre);
+    clearSearchDirectionInput("start");
+    clearSearchDirectionInput("end");
   };
   const clearSearchDirectionInput = (step: "start" | "end") => {
     //@ts-ignore
@@ -396,10 +398,7 @@ const MenuDrawer = () => {
               </span>
             </div>
           </div>
-          <div
-            className={styles.mobile_direction_container}
-            id="route_container"
-          >
+          <div className={styles.mobile_direction_container}>
             {directionData?.routes[0].legs[0].steps.map((step, i) => (
               <button
                 id={`button${i}`}
