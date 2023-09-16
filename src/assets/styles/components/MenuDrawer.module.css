@@ -180,22 +180,16 @@
   margin: 0.2rem;
 }
 
-.direction_container {
-  max-height: 60vh;
-  overflow: scroll;
-}
 .mobile_direction_container {
   overflow: scroll;
   width: 100%;
   height: calc(100% - 50px);
   padding-bottom: 4rem;
-}
-
-.direction_container {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-.direction_container::-webkit-scrollbar {
+
+.mobile_direction_container::-webkit-scrollbar {
   display: none;
 }
 .direction_method {
@@ -231,6 +225,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  cursor: pointer;
 }
 .direction_header_text {
   display: flex;
@@ -340,6 +335,7 @@
   margin-left: auto;
   display: block;
   color: var(--gray-7);
+  cursor: pointer;
 }
 .direction_button {
   text-align: center;
@@ -367,6 +363,7 @@
   font-size: 1rem;
   color: var(--gray-5);
   margin: 0 0.2rem;
+  cursor: pointer;
 }
 .disable_button {
   opacity: 0.3;
