@@ -1,0 +1,82 @@
+.modal_container {
+  width: 90%;
+  max-width: 500px;
+  border-radius: 1rem;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1100;
+  background-color: var(--white);
+  padding: 1.5rem;
+  overflow: auto;
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.modal_container img {
+  width: 50%;
+  display: block;
+  margin: auto;
+}
+.modal_container h1 {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--gray-11);
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.point_info {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--gray-10);
+  margin: 0;
+  margin-top: 0.5rem;
+  font-weight: bold;
+}
+.beta_info {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--gray-10);
+  margin: 0;
+  font-weight: bold;
+}
+.beta_info span {
+  color: var(--error);
+}
+.author_info {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--gray-6);
+  text-align: end;
+  margin: 1rem 0;
+}
+.modal_container::-webkit-scrollbar {
+  display: none;
+}
+
+.modal {
+  width: 100%;
+  position: fixed;
+  height: 100%;
+  background-color: rgba(var(--gray-11-rgb), 0.5);
+  z-index: 1099;
+  top: 0;
+  transition: transform 1s ease;
+}
+.modal_close {
+  transform: translate(0, 100%);
+  background-color: transparent;
+}
+
+.button {
+  width: 100%;
+  height: 3rem;
+  border-radius: 0.5rem;
+  color: var(--white);
+  background-color: var(--primary);
+  text-align: center;
+  cursor: pointer;
+}
