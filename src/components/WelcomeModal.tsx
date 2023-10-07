@@ -36,7 +36,10 @@ const WelcomeModal = () => {
         </p>
         <p className={styles.author_info}>
           {" "}
-          ساخته شده با ❤️ توسط <a>احمد</a>{" "}
+          ساخته شده با ❤️ توسط{" "}
+          <a href="https://smirjalili.ir" target="_blank">
+            احمد
+          </a>
         </p>
         <button onClick={closeModal} className={styles.button}>
           متوجه شدم
