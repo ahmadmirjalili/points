@@ -171,8 +171,6 @@ const MenuDrawer = () => {
         map?._layers
       );
       createLayerArr.forEach((layer, i) => {
-        console.log("layer", layer);
-
         if (layer.options.color === variable.success && map) {
           map.removeLayer(createLayerArr[i]);
         }

@@ -53,6 +53,10 @@
   text-align: end;
   margin: 1rem 0;
 }
+.author_info a {
+  text-decoration-line: none;
+  color: var(--primary);
+}
 .modal_container::-webkit-scrollbar {
   display: none;
 }
